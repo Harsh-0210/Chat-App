@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import path from 'path';
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -15,7 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 const URI = process.env.MONGODB_URI;
 
 try {
@@ -28,6 +29,17 @@ try {
 //routes
 app.use("/api/user", userRoute);
 app.use("/api/message", messageRoute);
+app.use("/api/users",userRoute)
+
+// For Deployment
+if(process.env.NODE_ENV == 'production'){
+    const dirPath = path.resolve();
+    app.use(express.static('./Frontend/dist'));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(dirPath, "Frontend/dist","index.html"));
+    })
+}
+
 
 server.listen(PORT, () => {
     console.log(`Server is Running on port ${PORT}`);
